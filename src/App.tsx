@@ -244,7 +244,7 @@ const App: React.FC = () => {
       </div>
       <footer>
         <span>
-          Made by <a href="https://github.com/mathpunch/typingspeedgame" target="_blank" rel="noopener noreferrer">mathpunch</a> · Hosted on Vercel
+          Made By <a href="https://aboutozzy.vercel.app" target="_blank" rel="noopener noreferrer">Ozzy</a> · Known As mathpunch
         </span>
       </footer>
     </div>
