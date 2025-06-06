@@ -38,6 +38,7 @@ const App: React.FC = () => {
   const [status, setStatus] = useState<"playing" | "won" | "lost" | "idle">("idle");
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Animation state for current word
   const [wordAnim, setWordAnim] = useState(false);
@@ -68,6 +69,20 @@ const App: React.FC = () => {
     if (inputRef.current && started) inputRef.current.focus();
   }, [started, currentWordIdx]);
 
+  // MOBILE: Scroll to top when input is focused
+  useEffect(() => {
+    const handleFocus = () => {
+      setTimeout(() => {
+        containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 200);
+    };
+    const el = inputRef.current;
+    if (el) {
+      el.addEventListener("focus", handleFocus);
+      return () => el.removeEventListener("focus", handleFocus);
+    }
+  }, [started]);
+
   function startGame() {
     const { words: wordsCount, time } = DIFFICULTY[difficulty];
     setWords(getRandomWords(wordsCount));
@@ -81,7 +96,11 @@ const App: React.FC = () => {
 
   function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setInput(e.target.value);
-    if (e.target.value.trim() === words[currentWordIdx]) {
+    // Case-insensitive check
+    if (
+      e.target.value.trim().toLowerCase() ===
+      words[currentWordIdx].toLowerCase()
+    ) {
       setWordAnim(true);
       setTimeout(() => setWordAnim(false), 350);
       if (currentWordIdx === words.length - 1) {
@@ -110,7 +129,7 @@ const App: React.FC = () => {
   const timerPercent = Math.max(0, Math.min(100, (timer / maxTime) * 100));
 
   return (
-    <div className="container">
+    <div className="container" ref={containerRef}>
       <h1>⚡ Typing Speed Game ⚡</h1>
       <div className="settings">
         <label>
@@ -130,7 +149,6 @@ const App: React.FC = () => {
             Start Game
           </button>
         )}
-        {/* Show Restart if game is started (even during playing) or after win/loss */}
         {(started || status === "won" || status === "lost") && (
           <button
             className="restart-btn"
@@ -194,6 +212,8 @@ const App: React.FC = () => {
               autoComplete="off"
               spellCheck={false}
               aria-label="Type the current word"
+              inputMode="text"
+              autoCapitalize="none"
               style={{
                 boxShadow: input ? "0 0 16px #39ffd688, 0 2px 8px #3f77f644" : undefined,
                 borderColor: input ? "#39ffd6" : "#3f77f6"
