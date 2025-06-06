@@ -130,8 +130,16 @@ const App: React.FC = () => {
             Start Game
           </button>
         )}
-        {(status === "won" || status === "lost") && (
-          <button className="restart-btn" onClick={restart}>
+        {/* Show Restart if game is started (even during playing) or after win/loss */}
+        {(started || status === "won" || status === "lost") && (
+          <button
+            className="restart-btn"
+            onClick={restart}
+            style={{
+              animation: "fadein-card 0.6s",
+              marginLeft: "0.4rem",
+            }}
+          >
             Restart
           </button>
         )}
