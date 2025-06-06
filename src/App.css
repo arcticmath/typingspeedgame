@@ -269,10 +269,31 @@ footer a:hover {
 @media (max-width: 600px) {
   .container {
     margin-top: 0.5rem;
-    padding: 1.2rem 0.2rem 1.1rem 0.2rem;
+    padding: 0.6rem 0.1rem 0.9rem 0.1rem;
+    min-height: 100vh;
+    box-sizing: border-box;
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  .game-area {
+    min-height: 250px;
+    padding-bottom: 24vh;
+    position: relative;
+  }
+  .words {
+    font-size: 1.08rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 1.2em;
+    padding: 0 0.3em;
+    word-break: break-word;
+    max-width: 98vw;
   }
   .input-box {
-    width: 97%;
+    width: 99vw;
+    max-width: 99vw;
+    font-size: 1.17rem;
+    margin-bottom: 1em;
   }
-  h1 { font-size: 2rem; }
 }
