@@ -39,6 +39,9 @@ const App: React.FC = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Animation state for current word
+  const [wordAnim, setWordAnim] = useState(false);
+
   useEffect(() => {
     if (started && status === "playing") {
       timerRef.current = setInterval(() => {
@@ -79,12 +82,18 @@ const App: React.FC = () => {
   function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setInput(e.target.value);
     if (e.target.value.trim() === words[currentWordIdx]) {
+      setWordAnim(true);
+      setTimeout(() => setWordAnim(false), 350);
       if (currentWordIdx === words.length - 1) {
-        setStatus("won");
-        setStarted(false);
+        setTimeout(() => {
+          setStatus("won");
+          setStarted(false);
+        }, 350);
       } else {
-        setCurrentWordIdx(currentWordIdx + 1);
-        setInput("");
+        setTimeout(() => {
+          setCurrentWordIdx(currentWordIdx + 1);
+          setInput("");
+        }, 150);
       }
     }
   }
@@ -95,6 +104,10 @@ const App: React.FC = () => {
     setInput("");
     setWords([]);
   }
+
+  // Timer progress bar calculation
+  const maxTime = DIFFICULTY[difficulty].time;
+  const timerPercent = Math.max(0, Math.min(100, (timer / maxTime) * 100));
 
   return (
     <div className="container">
@@ -127,6 +140,18 @@ const App: React.FC = () => {
       <div className="game-area">
         <div className="timer">
           <span>⏰ {timer}s</span>
+          <div className="timer-bar-bg">
+            <div
+              className="timer-bar"
+              style={{
+                width: `${timerPercent}%`,
+                background: timerPercent < 35
+                  ? "linear-gradient(90deg, #ff3f59 0%, #ff8d39 100%)"
+                  : "linear-gradient(90deg, #39ffd6 0%, #3f77f6 100%)",
+                transition: timerPercent < 25 ? "width 0.3s cubic-bezier(.6,2,.2,1)" : "width 0.7s cubic-bezier(.32,1.56,.65,1)",
+              }}
+            />
+          </div>
         </div>
         {status === "playing" && (
           <>
@@ -136,11 +161,15 @@ const App: React.FC = () => {
                   key={word}
                   className={
                     idx === currentWordIdx
-                      ? "current-word"
+                      ? `current-word ${wordAnim ? "pop" : ""}`
                       : idx < currentWordIdx
                       ? "typed"
                       : ""
                   }
+                  style={idx === currentWordIdx && wordAnim ? {
+                    filter: "blur(0px) brightness(1.25)",
+                    boxShadow: "0 2px 32px #39ffd677"
+                  } : undefined}
                 >
                   {word}
                 </span>
@@ -157,6 +186,10 @@ const App: React.FC = () => {
               autoComplete="off"
               spellCheck={false}
               aria-label="Type the current word"
+              style={{
+                boxShadow: input ? "0 0 16px #39ffd688, 0 2px 8px #3f77f644" : undefined,
+                borderColor: input ? "#39ffd6" : "#3f77f6"
+              }}
             />
           </>
         )}
@@ -174,7 +207,7 @@ const App: React.FC = () => {
         )}
         {status === "idle" && <div className="instructions">
           <ul>
-            <li>Choose your difficulty</li>
+            <li>Choose your <strong>difficulty</strong></li>
             <li>Type each word as fast as you can</li>
             <li>Finish before the timer runs out!</li>
             <li>Works everywhere. Good luck ⚡</li>
